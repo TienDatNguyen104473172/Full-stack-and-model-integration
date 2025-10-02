@@ -1,0 +1,12 @@
+{
+  "python": "3.11.9",
+  "pandas": "2.3.2",
+  "scikit_learn": "1.7.1",
+  "numpy": "2.3.2",
+  "model_file": "sms_logreg_pipeline.joblib",
+  "threshold_file": "sms_logreg_threshold.json",
+  "threshold": 0.21847082686678884,
+  "text_column": "text_clean",
+  "label_column": "label",
+  "notes": "Pipeline = TF-IDF(1–2 grams, max_features=5000) + LogisticRegression(max_iter=1000)."
+}
