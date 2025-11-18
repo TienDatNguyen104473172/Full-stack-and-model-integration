@@ -19,21 +19,31 @@ Modeling approach: **TF‑IDF** vectorization → **Logistic Regression** (basel
 
 ## Folder Structure
 ```
-TienDatNguyen_Data_Collection_and_Processing/
-├─ data_final/
+full stack + tranning model/
+├─ data_raw/             # Raw data files
+│  ├─ SMSSpamCollection
+│  ├─ emails.csv
+│  └─ readme
+├─ data_work/            # Intermediate processed data
+│  ├─ step0_sms_loaded.csv
+│  ├─ step1_text_clean.csv
+│  └─ emails_step_cleaned.csv
+├─ data_final/           # Final train/test splits
 │  ├─ train.csv
-│  └─ test.csv
+│  ├─ test.csv
+│  ├─ emails_train.csv
+│  └─ emails_test.csv
 ├─ notebooks/
+│  ├─ prep_sms.ipynb     # Data preprocessing notebook
 │  └─ 01_sms_baseline.ipynb
-├─ models/               # created by Cell 9
+├─ models/               # Saved models (created by Cell 9)
 │  ├─ sms_logreg_pipeline.joblib
 │  ├─ sms_logreg_threshold.json
 │  └─ sms_logreg_metadata.json
-└─ report/               # created by Cell 10
-   ├─ classification_report_*.txt
-   ├─ cm_* .png
-   ├─ pr_curve_val.png
-   └─ metrics_summary.csv
+└─ report + readme/      # Reports and documentation
+   ├─ README_SMS_Model.md
+   ├─ Data_Collection_Processing_Report.docx
+   └─ SMS_Spam_Report.docx
 ```
 
 ## Requirements
@@ -43,7 +53,7 @@ TienDatNguyen_Data_Collection_and_Processing/
 Install (recommended virtual env):
 ```bash
 python -m venv .venv
-.\.venv\Scriptsctivate       # Windows
+.\.venv\Scripts\activate       # Windows
 pip install --upgrade pip
 pip install pandas numpy scikit-learn matplotlib joblib jupyter
 ```
@@ -51,7 +61,13 @@ pip install pandas numpy scikit-learn matplotlib joblib jupyter
 ## How to Run
 1) Open the notebook:
 ```bash
-cd TienDatNguyen_Data_Collection_and_Processing\notebooks
+cd "full stack + tranning model\notebooks"
+jupyter notebook
+```
+
+Or if you're already in the project root:
+```bash
+cd notebooks
 jupyter notebook
 ```
 2) Open **`01_sms_baseline.ipynb`** and run cells **top → bottom** in order:
@@ -78,6 +94,7 @@ jupyter notebook
 
 - **Cell 6 – Precision–Recall Curves (Validation)**  
   Plots PR curves and Average Precision (AP) for validation; used to see the trade‑off when changing the decision threshold.
+  note: in cell 6 u need to run cell 4 first if u run successfully run cell 4 but cell 6 doesn't work try run cell 4 again so cell 6 will work back.
 
 - **Cell 7 – Threshold Tuning (Validation)**  
   Picks a probability threshold to achieve a **target Recall (e.g., ≥ 0.90)**. Prints metrics and plots the confusion matrix at that threshold.  
@@ -98,6 +115,30 @@ jupyter notebook
 - **No training or tuning on the test set**; the tuned threshold is selected **only** on validation and then **applied** to test.  
 - Classification is the appropriate task; regression/clustering are **not** optimal for this dataset format.  
 - Email dataset (if used later) is kept separate because of different representation; repeat the same pipeline there if needed.
+
+## Model Performance Summary
+
+### Validation Set Results (80/20 split from train.csv)
+- **Logistic Regression (default threshold 0.5)**:
+  - Accuracy: 0.9649
+  - Precision: 0.9213
+  - Recall: 0.7885
+  - F1-Score: 0.8497
+
+- **Random Forest (default threshold 0.5)**:
+  - Accuracy: 0.9746
+  - Precision: 1.0000
+  - Recall: 0.7981
+  - F1-Score: 0.8877
+
+### Test Set Results (with tuned threshold)
+- **Logistic Regression (tuned threshold 0.2185)**:
+  - Accuracy: 0.9836
+  - Precision: 0.9191
+  - Recall: 0.9542 (target ≥ 0.90 achieved ✓)
+  - F1-Score: 0.9363
+
+**Note**: The tuned threshold (0.2185) was selected on validation set to achieve recall ≥ 0.90, then applied to test set. This significantly improves recall (from 0.878 to 0.954) while maintaining good precision.
 
 ## Reproducibility
 - All random processes set with `random_state=42`.  
