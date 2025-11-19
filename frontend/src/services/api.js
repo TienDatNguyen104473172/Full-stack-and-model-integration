@@ -1,0 +1,44 @@
+import axios from 'axios';
+
+// Tạo instance axios với cấu hình chuẩn
+const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 15000, // 15 giây
+});
+
+export const spamApi = {
+    // 1. Gửi tin nhắn để dự đoán
+    predict: async (text) => {
+        try {
+            const response = await apiClient.post('/predict', { content: text });
+            return response.data;
+        } catch (error) {
+            console.error("API Predict Error:", error);
+            throw error;
+        }
+    },
+
+    // 2. Lấy thông tin Model (Threshold, Metadata)
+    getInfo: async () => {
+        try {
+            const response = await apiClient.get('/info');
+            return response.data;
+        } catch (error) {
+            console.error("API Info Error:", error);
+            throw error;
+        }
+    },
+
+    // 3. Kiểm tra sức khỏe Server
+    checkHealth: async () => {
+        try {
+            const response = await apiClient.get('/health');
+            return response.data;
+        } catch (error) {
+            return { status: 'offline' };
+        }
+    }
+};
