@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  # --- Dịch vụ Backend (ĐÃ FIX BUILD CONTEXT) ---
+  # --- Dịch vụ Backend (ĐÃ CĂN CHỈNH) ---
   backend:
     build:
-      context: .  # Nhìn vào thư mục gốc để tìm models
-      dockerfile: ./backend/Dockerfile # Chỉ định đường dẫn tới Dockerfile
+      context: .
+      dockerfile: ./backend/Dockerfile
     container_name: spam-backend
     ports:
       - "8000:8000"
@@ -15,7 +15,7 @@ services:
     networks:
       - spam-network
 
-  # --- Dịch vụ Frontend ---
+  # --- Dịch vụ Frontend (ĐÃ CĂN CHỈNH) ---
   frontend:
     build: ./frontend
     container_name: spam-frontend
@@ -26,7 +26,7 @@ services:
     networks:
       - spam-network
 
-# --- Mạng nội bộ ---
+# --- Mạng nội bộ (PHẢI NẰM Ở CẤP ĐỘ GỐC) ---
 networks:
   spam-network:
     driver: bridge
