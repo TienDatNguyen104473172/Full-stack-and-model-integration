@@ -2,6 +2,7 @@ import joblib
 import json
 import os
 import logging
+from datetime import datetime
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,9 @@ from dotenv import load_dotenv
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+
+# --- MỚI: Import Model Monitoring ---
+from monitoring import ModelMonitor
 
 # --- 1. SETUP LOGGING ---
 logging.basicConfig(
@@ -38,10 +42,12 @@ CONFIG_PATH = os.path.join(BASE_DIR, "models", THRESHOLD_FILE)
 META_PATH = os.path.join(BASE_DIR, "models", METADATA_FILE)
 
 ml_models = {}
+model_monitor = None
 
 # --- LIFESPAN ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global model_monitor
     logger.info("Starting Spam Detection API...")
     try:
         if os.path.exists(MODEL_PATH):
@@ -67,6 +73,11 @@ async def lifespan(app: FastAPI):
         else:
             logger.warning("Metadata file not found.")
             ml_models["metadata"] = None
+
+        # --- MỚI: Khởi tạo Model Monitor ---
+        monitoring_dir = os.path.join(BASE_DIR, "monitoring_data")
+        model_monitor = ModelMonitor(storage_dir=monitoring_dir)
+        logger.info(f"Model Monitor initialized at: {monitoring_dir}")
 
     except Exception as e:
         logger.critical(f"Critical Error loading ML components: {e}")
@@ -130,6 +141,21 @@ def predict_spam(request: Request, email: EmailInput): # Thêm tham số 'reques
         
         logger.info(f"Prediction result: {result_label} (Confidence: {probability:.4f})")
 
+        # --- MỚI: Log prediction vào monitoring system ---
+        if model_monitor:
+            try:
+                client_ip = request.client.host if request.client else None
+                model_monitor.log_prediction(
+                    content=email.content,
+                    prediction=result_label,
+                    confidence=probability,
+                    is_spam=is_spam,
+                    threshold=threshold,
+                    client_ip=client_ip
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log prediction to monitor: {e}")
+
         return {
             "label": result_label,
             "confidence": float(probability),
@@ -161,3 +187,73 @@ def health_check():
 @app.get("/")
 def root():
     return {"message": "Spam Detection API is ready"}
+
+# --- MỚI: MODEL MONITORING ENDPOINTS ---
+
+@app.get("/monitoring/metrics")
+def get_monitoring_metrics():
+    """Lấy metrics tổng quan của model"""
+    if model_monitor is None:
+        raise HTTPException(status_code=503, detail="Model Monitor is not initialized")
+    
+    try:
+        overall_metrics = model_monitor.get_overall_metrics()
+        daily_stats = model_monitor.get_daily_stats(days=7)
+        hourly_stats = model_monitor.get_hourly_stats(hours=24)
+        drift_info = model_monitor.detect_drift(window_days=7)
+        
+        return {
+            "overall": overall_metrics,
+            "daily_stats": daily_stats,
+            "hourly_stats": hourly_stats,
+            "drift_detection": drift_info,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error getting monitoring metrics: {e}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving metrics: {str(e)}")
+
+@app.get("/monitoring/stats")
+def get_monitoring_stats(days: int = 7, hours: int = 24):
+    """Lấy thống kê chi tiết theo ngày và giờ"""
+    if model_monitor is None:
+        raise HTTPException(status_code=503, detail="Model Monitor is not initialized")
+    
+    try:
+        return {
+            "daily_stats": model_monitor.get_daily_stats(days=days),
+            "hourly_stats": model_monitor.get_hourly_stats(hours=hours),
+            "overall": model_monitor.get_overall_metrics()
+        }
+    except Exception as e:
+        logger.error(f"Error getting monitoring stats: {e}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving stats: {str(e)}")
+
+@app.get("/monitoring/predictions")
+def get_recent_predictions(limit: int = 100):
+    """Lấy các predictions gần nhất"""
+    if model_monitor is None:
+        raise HTTPException(status_code=503, detail="Model Monitor is not initialized")
+    
+    try:
+        predictions = model_monitor.get_recent_predictions(limit=limit)
+        return {
+            "count": len(predictions),
+            "predictions": predictions
+        }
+    except Exception as e:
+        logger.error(f"Error getting recent predictions: {e}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving predictions: {str(e)}")
+
+@app.get("/monitoring/drift")
+def get_drift_detection(window_days: int = 7):
+    """Kiểm tra data drift"""
+    if model_monitor is None:
+        raise HTTPException(status_code=503, detail="Model Monitor is not initialized")
+    
+    try:
+        drift_info = model_monitor.detect_drift(window_days=window_days)
+        return drift_info
+    except Exception as e:
+        logger.error(f"Error detecting drift: {e}")
+        raise HTTPException(status_code=500, detail=f"Error detecting drift: {str(e)}")

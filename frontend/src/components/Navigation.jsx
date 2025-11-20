@@ -33,6 +33,13 @@ function Navigation() {
             <span className="nav-link-icon">📊</span>
             Analytics
           </Link>
+          <Link 
+            to="/monitoring" 
+            className={location.pathname === '/monitoring' ? 'active' : ''}
+          >
+            <span className="nav-link-icon">📈</span>
+            Monitoring
+          </Link>
         </div>
       </div>
     </nav>

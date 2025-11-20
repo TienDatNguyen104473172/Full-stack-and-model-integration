@@ -3,6 +3,7 @@ import Navigation from './components/Navigation';
 import HomePage from './pages/HomePage';
 import HistoryPage from './pages/HistoryPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import MonitoringPage from './pages/MonitoringPage';
 import './App.css';
 
 function App() {
@@ -40,6 +41,10 @@ function App() {
           <Route 
             path="/analytics" 
             element={<AnalyticsPage />} 
+          />
+          <Route 
+            path="/monitoring" 
+            element={<MonitoringPage />} 
           />
         </Routes>
       </div>

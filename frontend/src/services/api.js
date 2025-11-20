@@ -40,5 +40,52 @@ export const spamApi = {
         } catch (error) {
             return { status: 'offline' };
         }
+    },
+
+    // 4. Model Monitoring APIs
+    getMonitoringMetrics: async () => {
+        try {
+            const response = await apiClient.get('/monitoring/metrics');
+            return response.data;
+        } catch (error) {
+            console.error("API Monitoring Metrics Error:", error);
+            throw error;
+        }
+    },
+
+    getMonitoringStats: async (days = 7, hours = 24) => {
+        try {
+            const response = await apiClient.get('/monitoring/stats', {
+                params: { days, hours }
+            });
+            return response.data;
+        } catch (error) {
+            console.error("API Monitoring Stats Error:", error);
+            throw error;
+        }
+    },
+
+    getRecentPredictions: async (limit = 100) => {
+        try {
+            const response = await apiClient.get('/monitoring/predictions', {
+                params: { limit }
+            });
+            return response.data;
+        } catch (error) {
+            console.error("API Recent Predictions Error:", error);
+            throw error;
+        }
+    },
+
+    getDriftDetection: async (windowDays = 7) => {
+        try {
+            const response = await apiClient.get('/monitoring/drift', {
+                params: { window_days: windowDays }
+            });
+            return response.data;
+        } catch (error) {
+            console.error("API Drift Detection Error:", error);
+            throw error;
+        }
     }
 };

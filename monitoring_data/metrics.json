@@ -1,0 +1,31 @@
+{
+  "daily_stats": {
+    "2025-11-20": {
+      "total_predictions": 1,
+      "spam_count": 0,
+      "ham_count": 1,
+      "avg_confidence": 0.030013983368794874,
+      "confidence_sum": 0.030013983368794874,
+      "high_confidence_count": 0,
+      "low_confidence_count": 1
+    }
+  },
+  "hourly_stats": {
+    "2025-11-20 20:00:00": {
+      "total_predictions": 1,
+      "spam_count": 0,
+      "ham_count": 1,
+      "avg_confidence": 0.030013983368794874,
+      "confidence_sum": 0.030013983368794874
+    }
+  },
+  "overall": {
+    "total_predictions": 1,
+    "spam_count": 0,
+    "ham_count": 1,
+    "avg_confidence": 0.030013983368794874,
+    "confidence_sum": 0.030013983368794874,
+    "first_prediction": "2025-11-20T20:17:12.929872",
+    "last_prediction": "2025-11-20T20:17:12.929872"
+  }
+}
