@@ -7,8 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # THAY THẾ CHỖ NÀY BẰNG TÊN NGƯỜI DÙNG GITHUB CỦA BẠN!
-  IMAGE_OWNER: TienDatNguyen104473172 
+  IMAGE_OWNER: TienDatNguyen104473172 # <--- THAY BẰNG TÊN NGƯỜI DÙNG CỦA BẠN!
   REPOSITORY_NAME: full-stack-and-model-integration # Tên repo của bạn
 
 jobs:
@@ -30,30 +29,33 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          # Lấy tên repository từ context GitHub và chuyển sang chữ thường (lower)
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}
           tags: |
             type=raw,value=latest
             type=sha,format=short
 
-      # --- BƯỚC 1: BUILD VÀ PUSH BACKEND (ĐÃ FIX CÚ PHÁP TAGS) ---
+      # --- BƯỚC 1: BUILD VÀ PUSH BACKEND (ĐÃ CHUYỂN SANG CÚ PHÁP LIST AN TOÀN) ---
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          # SỬA LỖI CÚ PHÁP YAML: Nối chuỗi bằng dấu phẩy
-          tags: ${{ steps.meta.outputs.tags }}-backend,${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_backend:latest
+          tags: |
+            # Sử dụng định dạng List tiêu chuẩn để tránh lỗi YAML syntax
+            ${{ steps.meta.outputs.tags }}-backend
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_backend:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-      # --- BƯỚC 2: BUILD VÀ PUSH FRONTEND (ĐÃ FIX CÚ PHÁP TAGS) ---
+      # --- BƯỚC 2: BUILD VÀ PUSH FRONTEND (ĐÃ CHUYỂN SANG CÚ PHÁP LIST AN TOÀN) ---
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          # SỬA LỖI CÚ PHÁP YAML: Nối chuỗi bằng dấu phẩy
-          tags: ${{ steps.meta.outputs.tags }}-frontend,${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_frontend:latest
+          tags: |
+            # Sử dụng định dạng List tiêu chuẩn để tránh lỗi YAML syntax
+            ${{ steps.meta.outputs.tags }}-frontend
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_frontend:latest
           labels: ${{ steps.meta.outputs.labels }}
