@@ -2,26 +2,23 @@ services:
   # --- Dịch vụ Backend (FastAPI) ---
   - type: web
     name: backend
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: .
+    docker:
+      dockerfilePath: ./backend/Dockerfile
+      dockerContext: .
     envVars:
       - key: ALLOWED_ORIGINS
-        # Render sẽ tự động inject URL của frontend service
-        # Thay 'frontend' bằng tên service frontend của bạn
         value: https://frontend.onrender.com,http://localhost:3000,http://localhost:5173
-    plan: free  # Hoặc starter, standard tùy nhu cầu
-    region: singapore  # Hoặc oregon, frankfurt, etc.
+    plan: free
+    region: singapore
 
   # --- Dịch vụ Frontend (React + Vite) ---
   - type: web
     name: frontend
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
+    docker:
+      dockerfilePath: ./frontend/Dockerfile
+      dockerContext: ./frontend
     envVars:
-      # Vite cần biến này ở build time, Render sẽ thay thế ${backend} bằng URL thực tế
       - key: VITE_API_URL
-        # Render sẽ tự động inject URL của backend service nếu bạn dùng ${backend}
-        # Hoặc bạn có thể hardcode: https://backend.onrender.com
         value: https://backend.onrender.com
     plan: free
     region: singapore
