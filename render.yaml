@@ -2,9 +2,8 @@ services:
   # --- Dịch vụ Backend (FastAPI) ---
   - type: web
     name: backend
-    docker:
-      dockerfilePath: ./backend/Dockerfile
-      dockerContext: .
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./
     envVars:
       - key: ALLOWED_ORIGINS
         value: https://frontend.onrender.com,http://localhost:3000,http://localhost:5173
@@ -14,9 +13,8 @@ services:
   # --- Dịch vụ Frontend (React + Vite) ---
   - type: web
     name: frontend
-    docker:
-      dockerfilePath: ./frontend/Dockerfile
-      dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./
     envVars:
       - key: VITE_API_URL
         value: https://backend.onrender.com
