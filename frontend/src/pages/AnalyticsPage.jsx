@@ -153,13 +153,21 @@ function AnalyticsPage() {
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={comparisonData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
-                <Legend />
-                <Bar dataKey="Logistic Regression (Val)" fill="#667eea" />
-                <Bar dataKey="Random Forest (Val)" fill="#764ba2" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: '#cbd5e1' }} />
+                <YAxis domain={[0, 100]} stroke="#94a3b8" tick={{ fill: '#cbd5e1' }} />
+                <Tooltip 
+                  formatter={(value) => `${value.toFixed(2)}%`}
+                  contentStyle={{
+                    backgroundColor: '#1e293b',
+                    border: '1px solid #334155',
+                    borderRadius: '8px',
+                    color: '#f1f5f9'
+                  }}
+                />
+                <Legend wrapperStyle={{ color: '#cbd5e1' }} />
+                <Bar dataKey="Logistic Regression (Val)" fill="#06b6d4" />
+                <Bar dataKey="Random Forest (Val)" fill="#3b82f6" />
                 <Bar dataKey="Logistic Regression (Test)" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
@@ -172,14 +180,22 @@ function AnalyticsPage() {
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={metricsLineData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="metric" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
-                <Legend />
-                <Line type="monotone" dataKey="LogReg Val" stroke="#667eea" strokeWidth={3} dot={{ r: 6 }} />
-                <Line type="monotone" dataKey="RF Val" stroke="#764ba2" strokeWidth={3} dot={{ r: 6 }} />
-                <Line type="monotone" dataKey="LogReg Test" stroke="#10b981" strokeWidth={3} dot={{ r: 6 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                <XAxis dataKey="metric" stroke="#94a3b8" tick={{ fill: '#cbd5e1' }} />
+                <YAxis domain={[0, 100]} stroke="#94a3b8" tick={{ fill: '#cbd5e1' }} />
+                <Tooltip 
+                  formatter={(value) => `${value.toFixed(2)}%`}
+                  contentStyle={{
+                    backgroundColor: '#1e293b',
+                    border: '1px solid #334155',
+                    borderRadius: '8px',
+                    color: '#f1f5f9'
+                  }}
+                />
+                <Legend wrapperStyle={{ color: '#cbd5e1' }} />
+                <Line type="monotone" dataKey="LogReg Val" stroke="#06b6d4" strokeWidth={3} dot={{ r: 6, fill: '#06b6d4' }} />
+                <Line type="monotone" dataKey="RF Val" stroke="#3b82f6" strokeWidth={3} dot={{ r: 6, fill: '#3b82f6' }} />
+                <Line type="monotone" dataKey="LogReg Test" stroke="#10b981" strokeWidth={3} dot={{ r: 6, fill: '#10b981' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -217,10 +233,18 @@ function AnalyticsPage() {
                   <PieChart>
                     <Pie data={userPieData} cx="50%" cy="50%" labelLine={false}
                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100} fill="#8884d8" dataKey="value">
+                      outerRadius={100} fill="#8884d8" dataKey="value"
+                      labelStyle={{ fill: '#f1f5f9', fontWeight: 600 }}>
                       {userPieData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: '#1e293b',
+                        border: '1px solid #334155',
+                        borderRadius: '8px',
+                        color: '#f1f5f9'
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -232,11 +256,18 @@ function AnalyticsPage() {
                 <div className="chart-container">
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={dailyTrend}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                      <XAxis dataKey="date" stroke="#94a3b8" tick={{ fill: '#cbd5e1' }} />
+                      <YAxis stroke="#94a3b8" tick={{ fill: '#cbd5e1' }} />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: '#1e293b',
+                          border: '1px solid #334155',
+                          borderRadius: '8px',
+                          color: '#f1f5f9'
+                        }}
+                      />
+                      <Legend wrapperStyle={{ color: '#cbd5e1' }} />
                       <Bar dataKey="spam" fill="#ef4444" name="Spam" />
                       <Bar dataKey="ham" fill="#10b981" name="Safe" />
                     </BarChart>

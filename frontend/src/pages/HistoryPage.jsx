@@ -109,55 +109,64 @@ function HistoryPage() {
               </button>
             </div>
 
-            <div className="history-list">
+            <div className="history-table-container">
               {filteredHistory.length > 0 ? (
-                filteredHistory.map((item, index) => {
-                  const originalIndex = history.findIndex(h => h === item);
-                  return (
-                    <div
-                      key={index}
-                      className={`history-item ${item.label === 'SPAM' ? 'spam' : 'ham'}`}
-                    >
-                      <div className="history-item-header">
-                        <div className="history-item-label">
-                          <span className="label-icon">
-                            {item.label === 'SPAM' ? '🚨' : '✅'}
-                          </span>
-                          <span className="label-text">{item.label}</span>
-                        </div>
-                        <div className="history-item-actions">
-                          <span className="history-date">
-                            {formatDate(item.timestamp)}
-                          </span>
-                          <button
-                            onClick={() => deleteItem(originalIndex)}
-                            className="delete-btn"
-                            title="Delete"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="history-item-content">
-                        <div className="content-text">
-                          {item.text.length > 200
-                            ? `${item.text.substring(0, 200)}...`
-                            : item.text}
-                        </div>
-                      </div>
-
-                      <div className="history-item-footer">
-                        <div className="confidence-badge">
-                          <span>Confidence:</span>
-                          <span className="confidence-number">
-                            {(item.confidence * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
+                <table className="history-table">
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Message</th>
+                      <th>Confidence</th>
+                      <th>Date</th>
+                      <th className="action-cell">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredHistory.map((item, index) => {
+                      const originalIndex = history.findIndex(h => h === item);
+                      return (
+                        <tr key={index}>
+                          <td>
+                            <span className={`status-badge ${item.label === 'SPAM' ? 'spam' : 'ham'}`}>
+                              <span className="badge-icon">
+                                {item.label === 'SPAM' ? '🚨' : '✅'}
+                              </span>
+                              {item.label}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="message-text" title={item.text}>
+                              {item.text.length > 150
+                                ? `${item.text.substring(0, 150)}...`
+                                : item.text}
+                            </div>
+                          </td>
+                          <td>
+                            <div className="confidence-badge">
+                              <span className="confidence-number">
+                                {(item.confidence * 100).toFixed(1)}%
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            <span className="date-cell">
+                              {formatDate(item.timestamp)}
+                            </span>
+                          </td>
+                          <td className="action-cell">
+                            <button
+                              onClick={() => deleteItem(originalIndex)}
+                              className="delete-btn"
+                              title="Delete"
+                            >
+                              ✕
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               ) : (
                 <div className="no-results">
                   <p>No {filter === 'all' ? '' : filter} results found</p>

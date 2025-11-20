@@ -109,7 +109,7 @@ function HomePage({ onSaveHistory }) {
           <div className={`result-card ${predictionResult.label === 'SPAM' ? 'spam' : 'ham'}`}>
             <div className="result-header">
               <div className="result-icon">
-                {predictionResult.label === 'SPAM' ? 'SPAM' : 'SAFE'}
+                {predictionResult.label === 'SPAM' ? '🚨' : '✅'}
               </div>
               <div className="result-title">
                 <h2>{predictionResult.label === 'SPAM' ? 'Spam Detected!' : 'Safe Message'}</h2>
