@@ -25,37 +25,40 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags) for Docker
-        id: meta
+      - name: Extract metadata for Backend
+        id: meta-backend
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}
-          # Dùng list format chuẩn cho tags
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name }}_backend
           tags: |
             type=raw,value=latest
             type=sha,format=short
 
-      # --- BƯỚC 1: BUILD VÀ PUSH BACKEND (ĐÃ CHUYỂN SANG LIST AN TOÀN) ---
+      - name: Extract metadata for Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name }}_frontend
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      # --- BƯỚC 1: BUILD VÀ PUSH BACKEND ---
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          # SỬ DỤNG CÚ PHÁP LIST DỄ HIỂU HƠN CHO TAGS
-          tags:
-            - ${{ steps.meta.outputs.tags }}-backend
-            - ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_backend:latest
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
 
-      # --- BƯỚC 2: BUILD VÀ PUSH FRONTEND (ĐÃ CHUYỂN SANG LIST AN TOÀN) ---
+      # --- BƯỚC 2: BUILD VÀ PUSH FRONTEND ---
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags:
-            - ${{ steps.meta.outputs.tags }}-frontend
-            - ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_frontend:latest
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
