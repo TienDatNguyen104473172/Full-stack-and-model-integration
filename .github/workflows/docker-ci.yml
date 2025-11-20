@@ -30,32 +30,32 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}
+          # Dùng list format chuẩn cho tags
           tags: |
             type=raw,value=latest
             type=sha,format=short
 
-      # --- BƯỚC 1: BUILD VÀ PUSH BACKEND (ĐÃ CHUYỂN SANG CÚ PHÁP LIST AN TOÀN) ---
+      # --- BƯỚC 1: BUILD VÀ PUSH BACKEND (ĐÃ CHUYỂN SANG LIST AN TOÀN) ---
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: |
-            # Sử dụng định dạng List tiêu chuẩn để tránh lỗi YAML syntax
-            ${{ steps.meta.outputs.tags }}-backend
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_backend:latest
+          # SỬ DỤNG CÚ PHÁP LIST DỄ HIỂU HƠN CHO TAGS
+          tags:
+            - ${{ steps.meta.outputs.tags }}-backend
+            - ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_backend:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-      # --- BƯỚC 2: BUILD VÀ PUSH FRONTEND (ĐÃ CHUYỂN SANG CÚ PHÁP LIST AN TOÀN) ---
+      # --- BƯỚC 2: BUILD VÀ PUSH FRONTEND (ĐÃ CHUYỂN SANG LIST AN TOÀN) ---
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: |
-            # Sử dụng định dạng List tiêu chuẩn để tránh lỗi YAML syntax
-            ${{ steps.meta.outputs.tags }}-frontend
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_frontend:latest
+          tags:
+            - ${{ steps.meta.outputs.tags }}-frontend
+            - ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_frontend:latest
           labels: ${{ steps.meta.outputs.labels }}
