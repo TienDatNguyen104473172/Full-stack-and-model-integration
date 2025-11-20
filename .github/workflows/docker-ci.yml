@@ -6,12 +6,9 @@ on:
       - Main # Tự động chạy mỗi khi có code được đẩy lên nhánh Main
 
 env:
-  # Tên Registry (nơi chứa Docker Image, dùng cho Bước 2)
   REGISTRY: ghcr.io
-  # Tên người dùng GitHub của bạn (thay bằng tên thật của bạn)
-  IMAGE_OWNER: TienDatNguyen104473172
-  # Tên dự án Docker 
-  REPOSITORY_NAME: Full-stack-and-model-integration
+  IMAGE_OWNER: TienDatNguyen104473172 
+  REPOSITORY_NAME: full-stack-and-model-integration
 
 jobs:
   build-and-push:
@@ -19,12 +16,11 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Kéo code về máy ảo
+        uses: actions/checkout@v4
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
-          # Đăng nhập vào GitHub Container Registry (dùng Token của GitHub)
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
@@ -35,15 +31,26 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ env.REPOSITORY_NAME }}
 
-      - name: Build and Push Docker images (Backend & Frontend)
+      # --- BƯỚC MỚI 1: BUILD VÀ PUSH BACKEND ---
+      - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
-          context: . # Sử dụng docker-compose.yml ở thư mục gốc
-          file: docker-compose.yml # File cấu hình Docker
+          context: ./backend # Chỉ định thư mục Context
+          file: ./backend/Dockerfile # Chỉ định Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}-backend
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ env.REPOSITORY_NAME }}_backend:latest
           labels: ${{ steps.meta.outputs.labels }}
-          # Chỉ định image (Backend và Frontend) sẽ được build
-          target: |
-            backend
-            frontend
+
+      # --- BƯỚC MỚI 2: BUILD VÀ PUSH FRONTEND ---
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend # Chỉ định thư mục Context
+          file: ./frontend/Dockerfile # Chỉ định Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.tags }}-frontend
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ env.REPOSITORY_NAME }}_frontend:latest
+          labels: ${{ steps.meta.outputs.labels }}
