@@ -1,16 +1,16 @@
 version: '3.8'
 
 services:
-  # --- Dịch vụ Backend (ĐÃ FIX CONTEXT VÀ ĐƯỜNG DẪN) ---
+  # --- Dịch vụ Backend (ĐÃ FIX BUILD CONTEXT) ---
   backend:
     build:
-      context: .  # Dặn Docker nhìn vào thư mục gốc của dự án
-      dockerfile: ./backend/Dockerfile # Đường dẫn tới Dockerfile
+      context: .  # Nhìn vào thư mục gốc để tìm models
+      dockerfile: ./backend/Dockerfile # Chỉ định đường dẫn tới Dockerfile
     container_name: spam-backend
     ports:
       - "8000:8000"
     environment:
-      # Cấu hình CORS (Đảm bảo Frontend/Browser có thể gọi)
+      # Cấu hình CORS (Phải được set)
       - ALLOWED_ORIGINS=http://localhost,http://localhost:3000,http://localhost:5173
     networks:
       - spam-network

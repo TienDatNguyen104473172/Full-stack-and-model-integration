@@ -3,12 +3,13 @@ name: Docker CI/CD (Build & Push)
 on:
   push:
     branches:
-      - Main # Tự động chạy mỗi khi có code được đẩy lên nhánh Main
+      - Main
 
 env:
   REGISTRY: ghcr.io
+  # THAY THẾ CHỖ NÀY BẰNG TÊN NGƯỜI DÙNG GITHUB CỦA BẠN!
   IMAGE_OWNER: TienDatNguyen104473172 
-  REPOSITORY_NAME: full-stack-and-model-integration
+  REPOSITORY_NAME: full-stack-and-model-integration # Tên repo của bạn
 
 jobs:
   build-and-push:
@@ -29,28 +30,30 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ env.REPOSITORY_NAME }}
+          # SỬ DỤNG LỌC lower() TRÊN TÊN REPO ĐỂ TRÁNH LỖI CHỮ HOA
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
 
-      # --- BƯỚC MỚI 1: BUILD VÀ PUSH BACKEND ---
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend # Chỉ định thư mục Context
-          file: ./backend/Dockerfile # Chỉ định Dockerfile
+          context: ./backend 
+          file: ./backend/Dockerfile 
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}-backend
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ env.REPOSITORY_NAME }}_backend:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_backend:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-      # --- BƯỚC MỚI 2: BUILD VÀ PUSH FRONTEND ---
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend # Chỉ định thư mục Context
-          file: ./frontend/Dockerfile # Chỉ định Dockerfile
+          context: ./frontend
+          file: ./frontend/Dockerfile
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}-frontend
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ env.REPOSITORY_NAME }}_frontend:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ github.event.repository.name | lower }}_frontend:latest
           labels: ${{ steps.meta.outputs.labels }}
